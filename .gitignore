@@ -1,0 +1,14 @@
+# API Keys and sensitive files
+.env
+config.js
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+
+# Node modules (if you add npm later)
+node_modules/

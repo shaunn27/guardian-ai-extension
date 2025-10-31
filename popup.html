@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>🛡️ Teen Safety Guardian</h1>
+    
+    <div class="status" id="status">
+      <span class="status-indicator active"></span>
+      <span>Protection Active</span>
+    </div>
+
+    <!-- NEW: AI Mode Display -->
+    <div class="ai-mode" id="aiMode">
+      <span class="ai-icon">🤖</span>
+      <span id="aiModeText">Checking AI...</span>
+    </div>
+
+    <div class="stats">
+      <div class="stat-item">
+        <div class="stat-number" id="warningsCount">0</div>
+        <div class="stat-label">Warnings Today</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" id="pagesScanned">0</div>
+        <div class="stat-label">Pages Scanned</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Features</h3>
+      <div class="feature">
+        <span>🚨 Content Safety Filter</span>
+        <label class="switch">
+          <input type="checkbox" id="contentFilter" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="feature">
+        <span>📝 Grammar Assistant</span>
+        <label class="switch">
+          <input type="checkbox" id="grammarCheck" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="feature">
+        <span>🎣 Scam Detection</span>
+        <label class="switch">
+          <input type="checkbox" id="scamDetection" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <button id="testBtn" class="test-btn">Test Current Page</button>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>
