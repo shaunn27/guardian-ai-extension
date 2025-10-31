@@ -1,20 +1,16 @@
-// ⚠️ IMPORTANT: Replace YOUR_API_KEY_HERE with your actual API key!
 const CONFIG = {
-  GEMINI_API_KEY: 'YOUR_API_KEY_HERE', // <<< PUT YOUR KEY HERE
+  GEMINI_API_KEY: 'YOUR_API_KEY_HERE',
   GEMINI_API_URL: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent'
 };
 
-// Initialize AI sessions
 let chromeAIAvailable = false;
 let promptSession = null;
 let proofreaderSession = null;
 
-// Set up AI when extension starts
 chrome.runtime.onInstalled.addListener(async () => {
   console.log('🛡️ Teen Safety Guardian installed');
   await checkAIAvailability();
   
-  // Initialize stats
   chrome.storage.local.set({
     warningsCount: 0,
     pagesScanned: 0,
@@ -23,44 +19,39 @@ chrome.runtime.onInstalled.addListener(async () => {
 });
 
 chrome.runtime.onStartup.addListener(async () => {
-  console.log('🛡️ Teen Safety Guardian starting up');
+  console.log('Teen Safety Guardian starting up');
   await checkAIAvailability();
 });
 
-// Check which AI is available
 async function checkAIAvailability() {
-  console.log('🔍 Checking AI availability...');
+  console.log('Checking AI availability...');
   
-  // Try Chrome Built-in AI first
   try {
     if (self.ai && self.ai.languageModel) {
       const capabilities = await self.ai.languageModel.capabilities();
       if (capabilities.available === 'readily') {
-        console.log('✅ Chrome Built-in AI available!');
+        console.log('Chrome Built-in AI available!');
         chromeAIAvailable = true;
         await initializeChromeAI();
         return;
       }
     }
   } catch (error) {
-    console.log('ℹ️ Chrome Built-in AI not available:', error.message);
+    console.log('Chrome Built-in AI not available:', error.message);
   }
-  
-  // Fallback to Gemini API
-  console.log('🌐 Using Gemini API (cloud-based)');
+
+  console.log('Using Gemini API (cloud-based)');
   chromeAIAvailable = false;
   
-  // Test Gemini API connection
   try {
     await testGeminiAPI();
-    console.log('✅ Gemini API connected successfully');
+    console.log('Gemini API connected successfully');
   } catch (error) {
-    console.error('❌ Gemini API connection failed:', error.message);
+    console.error('Gemini API connection failed:', error.message);
     console.error('Check if your API key is correct in background.js');
   }
 }
 
-// Initialize Chrome Built-in AI
 async function initializeChromeAI() {
   try {
     if (self.ai.languageModel) {
@@ -72,12 +63,12 @@ async function initializeChromeAI() {
 4. Cyberbullying language
 Rate severity: SAFE, CAUTION, or DANGER. Be brief and specific.`
       });
-      console.log('✅ Chrome Prompt API ready');
+      console.log('Chrome Prompt API ready');
     }
 
     if (self.ai.proofreader) {
       proofreaderSession = await self.ai.proofreader.create();
-      console.log('✅ Chrome Proofreader API ready');
+      console.log('Chrome Proofreader API ready');
     }
   } catch (error) {
     console.error('Chrome AI initialization failed:', error);
@@ -85,7 +76,6 @@ Rate severity: SAFE, CAUTION, or DANGER. Be brief and specific.`
   }
 }
 
-// Test Gemini API connection
 async function testGeminiAPI() {
   const url = `${CONFIG.GEMINI_API_URL}?key=${CONFIG.GEMINI_API_KEY}`;
   
@@ -111,26 +101,22 @@ async function testGeminiAPI() {
   return data;
 }
 
-// Listen for messages from content script
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  console.log('📨 Message received:', request.action);
-  
-  // Validate request exists
+  console.log('Message received:', request.action);
+
   if (!request || !request.action) {
     sendResponse({ error: 'Invalid request' });
     return true;
   }
   
   if (request.action === 'analyzeContent') {
-    // Validate text exists
     if (!request.text) {
       sendResponse({ safe: true, riskLevel: 'SAFE', reason: 'No content to analyze' });
       return true;
     }
     
-    console.log('🔍 Analyzing content...');
+    console.log('Analyzing content...');
     
-    // Call the analysis function
     (async () => {
       try {
         let result;
@@ -141,10 +127,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           result = await analyzeGeminiAPI(request.text);
         }
         
-        console.log('✅ Sending result:', result);
+        console.log('Sending result:', result);
         sendResponse(result);
       } catch (error) {
-        console.error('❌ Analysis error:', error);
+        console.error('Analysis error:', error);
         sendResponse({ 
           safe: true, 
           riskLevel: 'SAFE', 
@@ -153,7 +139,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       }
     })();
     
-    return true; // Keep channel open for async response
+    return true;
   }
   
   if (request.action === 'checkGrammar') {
@@ -162,7 +148,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       return true;
     }
     
-    console.log('📝 Checking grammar...');
+    console.log('Checking grammar...');
     
     (async () => {
       try {
@@ -176,7 +162,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         
         sendResponse(result);
       } catch (error) {
-        console.error('❌ Grammar check error:', error);
+        console.error('Grammar check error:', error);
         sendResponse({ hasErrors: false, corrections: [] });
       }
     })();
@@ -207,12 +193,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   return false;
 });
 
-// Analyze using Gemini API
+
 async function analyzeGeminiAPI(text) {
   try {
     const url = `${CONFIG.GEMINI_API_URL}?key=${CONFIG.GEMINI_API_KEY}`;
     
-    console.log('📤 Calling Gemini API...');
+    console.log('Calling Gemini API...');
     
     const response = await fetch(url, {
       method: 'POST',
@@ -240,46 +226,43 @@ Content to analyze: ${text.substring(0, 500)}`
     
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('❌ API Response Error:', response.status, errorText);
+      console.error('API Response Error:', response.status, errorText);
       throw new Error(`API error: ${response.status}`);
     }
     
     const data = await response.json();
-    console.log('📥 API Response:', data);
+    console.log('API Response:', data);
     
-    // Check if response has the expected structure
     if (!data || !data.candidates || !data.candidates[0]) {
-      console.error('❌ Unexpected API response structure:', data);
+      console.error('Unexpected API response structure:', data);
       return { safe: true, riskLevel: 'SAFE', reason: 'Unable to parse response' };
     }
     
     const candidate = data.candidates[0];
     if (!candidate.content || !candidate.content.parts || !candidate.content.parts[0]) {
-      console.error('❌ Missing content in response:', candidate);
+      console.error('Missing content in response:', candidate);
       return { safe: true, riskLevel: 'SAFE', reason: 'Unable to parse response' };
     }
     
     const textResult = candidate.content.parts[0].text || '{"safe": true, "riskLevel": "SAFE"}';
-    console.log('📄 Raw text result:', textResult);
+    console.log('Raw text result:', textResult);
     
-    // Clean and parse JSON
     const cleanedText = textResult.replace(/```json|```/g, '').trim();
     const jsonMatch = cleanedText.match(/\{[\s\S]*\}/);
     
     if (jsonMatch) {
       const parsed = JSON.parse(jsonMatch[0]);
-      console.log('✅ Analysis result:', parsed);
+      console.log('Analysis result:', parsed);
       return parsed;
     }
     
     return { safe: true, riskLevel: 'SAFE', reason: 'Unable to parse response' };
   } catch (error) {
-    console.error('❌ Gemini API analysis failed:', error);
+    console.error(' Gemini API analysis failed:', error);
     throw error;
   }
 }
 
-// Grammar check using Gemini API (FIXED)
 async function checkGrammarGeminiAPI(text) {
   try {
     const url = `${CONFIG.GEMINI_API_URL}?key=${CONFIG.GEMINI_API_KEY}`;
@@ -312,7 +295,6 @@ Text: ${text.substring(0, 300)}`
     
     const data = await response.json();
     
-    // Check response structure
     if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
       return { hasErrors: false, corrections: [] };
     }
@@ -332,7 +314,6 @@ Text: ${text.substring(0, 300)}`
   }
 }
 
-// Analyze using Chrome Built-in AI (FIXED)
 async function analyzeChromeAI(text) {
   try {
     if (!promptSession) {
@@ -349,7 +330,6 @@ Content to analyze: ${text.substring(0, 500)}`;
     
     const result = await promptSession.prompt(prompt);
     
-    // Parse JSON response
     const jsonMatch = result.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
       return JSON.parse(jsonMatch[0]);
